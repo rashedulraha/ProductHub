@@ -5,9 +5,11 @@ import { useState } from "react";
 import { logout } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "./ModeToggle/ModeToggle";
+import { Menu, X } from "lucide-react";
 
 export default function Navbar() {
   const [isLoading, setIsLoading] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const handleLogout = async () => {
     setIsLoading(true);
@@ -21,51 +23,83 @@ export default function Navbar() {
     }
   };
 
-  //  mobile navbar and menu link
-
-  const NavLinkItem = (
-    <>
-      <div className="flex flex-col md:flex-row space-x-5 items-center">
-        <Link
-          href="/"
-          className="text-sm font-medium hover:text-primary transition-colors">
-          Home
-        </Link>
-        <Link
-          href="/items"
-          className="text-sm font-medium hover:text-primary transition-colors">
-          Items
-        </Link>
-      </div>
-    </>
-  );
-
   return (
-    <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-sm">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+    <nav className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur">
+      <div className="mx-auto max-w-7xl px-4 py-4 flex items-center justify-between">
+        {/* Logo */}
         <Link href="/" className="text-2xl font-bold text-primary">
           ProductHub
         </Link>
 
-        <div className="flex items-center gap-6">
-          {NavLinkItem}
+        {/* Desktop Menu */}
+        <div className="hidden md:flex items-center gap-6">
+          <Link href="/" className="text-sm font-medium hover:text-primary">
+            Home
+          </Link>
+          <Link
+            href="/items"
+            className="text-sm font-medium hover:text-primary">
+            Items
+          </Link>
 
-          <div className="flex gap-3">
-            <ModeToggle />
-            <Button asChild>
-              <Link href="/login">Login</Link>
-            </Button>
-            <Button
-              size="sm"
-              onClick={handleLogout}
-              disabled={isLoading}
-              className="hidden"
-              id="logout-btn">
-              {isLoading ? "Logging out..." : "Logout"}
-            </Button>
-          </div>
+          <ModeToggle />
+
+          <Button asChild>
+            <Link href="/login">Login</Link>
+          </Button>
+
+          <Button
+            size="sm"
+            onClick={handleLogout}
+            disabled={isLoading}
+            variant="outline">
+            {isLoading ? "Logging out..." : "Logout"}
+          </Button>
         </div>
+
+        {/* Mobile Menu Button */}
+        <button
+          className="md:hidden"
+          onClick={() => setOpen(!open)}
+          aria-label="Toggle Menu">
+          {open ? <X /> : <Menu />}
+        </button>
       </div>
+
+      {/* Mobile Menu */}
+      {open && (
+        <div className="md:hidden border-t bg-background px-4 py-6 space-y-4">
+          <Link
+            href="/"
+            onClick={() => setOpen(false)}
+            className="block text-sm font-medium">
+            Home
+          </Link>
+
+          <Link
+            href="/items"
+            onClick={() => setOpen(false)}
+            className="block text-sm font-medium">
+            Items
+          </Link>
+
+          <Link
+            href="/login"
+            onClick={() => setOpen(false)}
+            className="block text-sm font-medium">
+            Login
+          </Link>
+
+          <Button
+            onClick={handleLogout}
+            disabled={isLoading}
+            className="w-full">
+            {isLoading ? "Logging out..." : "Logout"}
+          </Button>
+
+          <ModeToggle />
+        </div>
+      )}
     </nav>
   );
 }
